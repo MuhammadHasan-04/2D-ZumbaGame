@@ -60,7 +60,7 @@ pathX1 db 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57
 pathX3 db 20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,72,72,72,72,72,72,70,68,66,64,62,60,58,58
       ;  db 70,68,66,64,62,60
 
-    pathY3 db 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10,10,10,10,10,10,10,12,14,16,18,20,22,22,22,22,22,22,22,22,20
+    pathY3 db 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10,10,10,10,10,10,10,12,14,16,18,20,22,22,22,22,22,22,22,22,20,19
         ;db 28,28,28,28,28,28
 ;
        numBalls dword 0
@@ -387,42 +387,37 @@ MainMenu PROC
 ret
 MainMenu ENDP
 
-createBalls Proc
+createBalls PROC
     ; Initialize variables
-cmp level,1
+    cmp level, 1
     je Level1
-cmp level,3
+    cmp level, 3
     je Level3
 
 Level1:
-
     mov esi, OFFSET pathX1    
     mov edi, OFFSET pathY1   
     mov ecx, sizeof pathX1
     mov ebx, 0                
-    mov eax, 0       
-JMP next
+    mov eax, 0
+    jmp next
 
 Level3:
-     mov esi, OFFSET pathX3    
+    mov esi, OFFSET pathX3    
     mov edi, OFFSET pathY3  
     mov ecx, sizeof pathX3
     mov ebx, 0                
-    mov eax, 0   
-jmp next
+    mov eax, 0
+    jmp next
 
 next:
     mov numBalls, 0
-    
-  
+
     ; Loop to create balls
 L1:
     mov dl, [esi]            ; load X coordinate
     mov dh, [edi]            ; load Y coordinate
-
     call GotoXY
-
-   
 
     ; Generate a random color for the ball
     mov eax, 15              
@@ -440,15 +435,12 @@ L1:
     call WriteChar
     jmp ballCreated
 
-    call MovePlayer
-
 continueNext:
     ; If the ball is not alive, draw a space
-    
     mov al, " "
     call WriteChar
-    mov dl , 10
-    mov dh , 10
+    mov dl, 10
+    mov dh, 10
     call GotoXY
 
 ballCreated:
@@ -461,20 +453,81 @@ ballCreated:
     inc edi
     inc ebx
 
+    ; Save registers before calling MovePlayer
+    push eax
+    push ecx
+    push edx
+    push esi
+    push edi
+    push ebx
+
+    ; Call MovePlayer
+    call MovePlayer
+
+    call ReadKey
+    cmp al, "p"
+    je NewP
+
+    ; Restore registers after MovePlayer
+    pop ebx
+    pop edi
+    pop esi
+    pop edx
+    pop ecx
+    pop eax
+
     ; Increment numBalls
     inc numBalls
 
     ; Loop condition
+    mov eax, 500
+    call Delay
     cmp numBalls, ecx
     jne L1
 
-    
-   
-
     ret
-createBalls EndP
+
+NewP:
+    mov eax , 500
+call Delay
+    call PauseGame
+    
+    pop ebx
+    pop edi
+    pop esi
+    pop edx
+    pop ecx
+    pop eax
+    jmp L1
+
+createBalls ENDP
 
 
+gameOver Proc
+
+mov ecx , sizeof pathX3
+
+cmp isAlive[ecx] , 1
+call clrscr
+
+newOne:
+mWrite  " ______     ______     __    __     ______        ______     __   __   ______     ______    ", 0
+mWrite  "/\  ___\   /\  __ \   /\ ""-./  \   /\  ___\      /\  __ \   /\ \ / /  /\  ___\   /\  == \   ", 0
+mWrite   "\ \ \__ \  \ \  __ \  \ \ \-./\ \  \ \  __\      \ \ \/\ \  \ \ \'/   \ \  __\   \ \  __<   ", 0
+mWrite   " \ \_____\  \ \_\ \_\  \ \_\ \ \_\  \ \_____\     \ \_____\  \ \__|    \ \_____\  \ \_\ \_\ ", 0
+mWrite  "  \/_____/   \/_/\/_/   \/_/  \/_/   \/_____/      \/_____/   \/_/      \/_____/   \/_/ /_/ ", 0
+mWrite  "                                                                                             ", 0
+
+mov eax, 0
+call ReadKey
+
+cmp al ,0
+jne done
+jmp newOne
+
+done:
+ret
+gameOver endp
 
 
 
@@ -575,7 +628,10 @@ fire_loop:
     mov dl, fire_col
     mov dh, fire_row
     call GoToXY
-
+         mov eax,  15
+        call RandomRange
+        inc eax
+       mov fire_color , al
     ; Loop to move the fireball in the current direction
     L1:
 
@@ -593,7 +649,7 @@ fire_loop:
         jge end_fire
 
         ; Print the fire symbol at the current position
-        movzx eax, fire_color    ; Set fire color
+        movzx eax , fire_color
         call SetTextColor
 
         add dl, xDir
@@ -640,14 +696,14 @@ Level1_col:
 
     mov esi, OFFSET pathX1    
     mov edi, OFFSET pathY1    
-    mov ecx, numBalls    
+    mov ecx,sizeof pathX1    
     mov ebx, 0
     jmp next1
 
 Level3_col:
     mov esi, OFFSET pathX3   
     mov edi, OFFSET pathY3    
-    mov ecx, numBalls    
+    mov ecx, sizeof pathX3    
     mov ebx, 0
     jmp next1
 
@@ -1093,6 +1149,13 @@ SelectLevel endp
 
 
 MovePlayer PROC
+    
+        push eax
+        push ecx
+        push edx
+        push esi
+        push edi
+        push ebx
 
     mov dx, 0
     call GoToXY
@@ -1105,7 +1168,10 @@ MovePlayer PROC
     ; Check for key press
     mov eax, 0
     call ReadKey
+    jz done
+
     mov inputChar, al
+    
 
     cmp inputChar, VK_SPACE
     je shoot
@@ -1113,8 +1179,7 @@ MovePlayer PROC
      cmp inputChar, VK_ESCAPE
     je togglePause
 
-    cmp inputChar, "p"
-    je pauseScreen
+    
 
     cmp inputChar, "w"
     je move
@@ -1141,7 +1206,9 @@ MovePlayer PROC
     je move
 
     cmp inputChar , "p"
-    je paused
+    je pauseScn
+
+   
 
     ; if character is invalid, check for a new keypress
     jmp checkInput
@@ -1150,10 +1217,6 @@ MovePlayer PROC
         mov al, inputChar
         mov direction, al
         jmp chosen
-
-    paused:
-        
-        call clearPlayer
 
      togglePause:
         cmp isPaused, 0
@@ -1171,11 +1234,13 @@ MovePlayer PROC
 		jmp checkInput
     shoot:
         call FireBall
-
+        jmp checkInput
     chosen:
         call PrintPlayer
         call MovePlayer
-   pauseScreen:
+        jmp checkInput
+
+    pauseScn:
         call PauseGame
         call clearPlayer
         call PlayerBouundary
@@ -1183,7 +1248,14 @@ MovePlayer PROC
 
 		jmp checkInput
         
+        
 done:
+            pop ebx
+            pop edi
+            pop esi
+            pop edx
+            pop ecx
+            pop eax
     ret
 MovePlayer ENDP
 
@@ -1448,9 +1520,11 @@ PauseGame PROC
     mWrite <"GAMEPAUSED">
 
 pauseScn:
-  
+    mov eax,100
+    call Delay
     mov isPaused, 1
     call readkey
+
     cmp al, "p"
     je done
     mov eax,100
@@ -1495,6 +1569,8 @@ main PROC
     call createBalls
 
     call MovePlayer
+
+    call gameOver
 
     exit
 main ENDP
