@@ -56,6 +56,15 @@ pathX1 db 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57
 
     pathY1 db 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10
        ;db 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ,10, 10, 10, 10, 10, 10, 10, 10, 10, 10
+
+        pathX2 db 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69
+      db 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99
+      ;db 99, 100,101,102, 103 ,104, 105, 106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128
+      
+
+
+      pathY2 db 10, 10.5, 11, 11.5, 11, 10.5, 10, 9.5, 9, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 11, 10.5, 10, 9.5, 9, 8.5, 9, 9.5, 10
+             db 10.5,11,11.5,11,10.5,10, 9.5, 9, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 11, 10.5, 10, 9.5, 9, 8.5, 9, 9.5
    
 pathX3 db 20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,72,72,72,72,72,72,70,68,66,64,62,60,58,58
       ;  db 70,68,66,64,62,60
@@ -130,9 +139,33 @@ player_s5 BYTE "  --- ", 0
           BYTE "|                                                                             |", 0
           BYTE "|                                                                             |", 0
           BYTE "|                                                                             |", 0
-          BYTE "|_____________________________________________________________________________|", 0
+          BYTE "|_|", 0
 
-
+   walls2 BYTE " _____________________________________________________________________________ ", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                 \   \   /       \   /       \   /       \   /   /           |", 0
+          BYTE "|                  \   \ /  /  \   \ /  /  \   \ /  /  \   \ /   /            |", 0
+          BYTE "|                   \      /    \      /    \      /    \       /             |", 0
+          BYTE "|                    \_   /      \    /      \    /      \  _  /              |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                    ---                                      |", 0
+          BYTE "|                                   |   |                                     |", 0
+          BYTE "|                                   |   |                                     |", 0
+          BYTE "|                                   |   |                                     |", 0
+          BYTE "|                                    ---                                      |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|                                                                             |", 0
+          BYTE "|_|", 0
 
     walls3 BYTE " _____________________________________________________________________________ ", 0
           BYTE "|                                                                             |", 0
@@ -158,7 +191,7 @@ player_s5 BYTE "  --- ", 0
           BYTE "|                                                                             |", 0
           BYTE "|                                                                             |", 0
           BYTE "|                                                                             |", 0
-          BYTE "|_____________________________________________________________________________|", 0
+          BYTE "|_|", 0
 
     ; Player sprite
     player_right BYTE "   ", 0
@@ -391,6 +424,10 @@ createBalls PROC
     ; Initialize variables
     cmp level, 1
     je Level1
+
+    cmp level, 2
+    je Level2
+
     cmp level, 3
     je Level3
 
@@ -398,6 +435,14 @@ Level1:
     mov esi, OFFSET pathX1    
     mov edi, OFFSET pathY1   
     mov ecx, sizeof pathX1
+    mov ebx, 0                
+    mov eax, 0
+    jmp next
+
+Level2:
+    mov esi, OFFSET pathX2   
+    mov edi, OFFSET pathY2   
+    mov ecx, sizeof pathX2
     mov ebx, 0                
     mov eax, 0
     jmp next
@@ -511,11 +556,11 @@ cmp isAlive[ecx] , 1
 call clrscr
 
 newOne:
-mWrite  " ______     ______     __    __     ______        ______     __   __   ______     ______    ", 0
-mWrite  "/\  ___\   /\  __ \   /\ ""-./  \   /\  ___\      /\  __ \   /\ \ / /  /\  ___\   /\  == \   ", 0
-mWrite   "\ \ \__ \  \ \  __ \  \ \ \-./\ \  \ \  __\      \ \ \/\ \  \ \ \'/   \ \  __\   \ \  __<   ", 0
-mWrite   " \ \_____\  \ \_\ \_\  \ \_\ \ \_\  \ \_____\     \ \_____\  \ \__|    \ \_____\  \ \_\ \_\ ", 0
-mWrite  "  \/_____/   \/_/\/_/   \/_/  \/_/   \/_____/      \/_____/   \/_/      \/_____/   \/_/ /_/ ", 0
+mWrite  " ______     ______     __    __     ______          ______     __   __   ______     ______    ", 0
+mWrite  "/\  ___\   /\   __ \   /\ ""-./  \   /\  ___\      /\  __ \   /\ \ / /  /\  ___\   /\  == \   ", 0
+mWrite   "\ \ \__ \   \  \  __\  \ \ \-./\ \  \ \  __\      \ \ \ /\ \  \ \ \'/   \ \  __\   \ \  __<   ", 0
+mWrite   " \ \\  \ \\ \\  \ \\ \ \\  \ \\     \ \\  \ \|     \ \\ \ \\\\ ", 0
+mWrite  "   \//   \//\//   \//  \//   \//      \//   \//      \//  \// /_/ ", 0
 mWrite  "                                                                                             ", 0
 
 mov eax, 0
@@ -689,6 +734,8 @@ CheckCollision PROC
 
     cmp level,1
     je Level1_col
+    cmp level ,2 
+    je Level2_col
     cmp level,3
     je Level3_col
 
@@ -696,7 +743,14 @@ Level1_col:
 
     mov esi, OFFSET pathX1    
     mov edi, OFFSET pathY1    
-    mov ecx,sizeof pathX1    
+    mov ecx, sizeof pathX1    
+    mov ebx, 0
+    jmp next1
+Level2_col:
+
+    mov esi, OFFSET pathX2    
+    mov edi, OFFSET pathY2    
+    mov ecx, sizeof pathX2   
     mov ebx, 0
     jmp next1
 
@@ -738,8 +792,9 @@ level1:
     call createBalls
     jmp next
 level2:
-    ;wall 2
-    ;balls2
+    call DrawWall2
+    call createBalls
+    jmp next
 level3:
     call DrawWall3
     call createBalls
@@ -766,7 +821,10 @@ NotAlive:
     inc ebx
 
     ; Loop condition
-    loop CheckLoop
+  dec ecx 
+ cmp ecx , 0
+jne CheckLoop
+
 
 Done:
     ret
@@ -888,6 +946,75 @@ DrawWall PROC
 
 	ret
 DrawWall ENDP
+
+
+DrawWall2 PROC
+	call clrscr
+
+    mov dl,19
+	mov dh,2
+	call Gotoxy
+	mWrite <"Score: ">
+	mov eax, Blue + (black * 16)
+	call SetTextColor
+	mov al, score
+	call WriteDec
+
+    mov eax, White + (black * 16)
+	call SetTextColor
+
+	mov dl,90
+	mov dh,2
+	call Gotoxy
+	mWrite <"Lives: ">
+	mov eax, Red + (black * 16)
+	call SetTextColor
+	mov al, lives
+	call WriteDec
+
+	mov eax, white + (black * 16)
+	call SetTextColor
+
+	mov dl,55
+	mov dh,2
+	call Gotoxy
+
+	mWrite "LEVEL " 
+	mov al, levelInfo
+	call WriteDec
+
+	mov eax, gray + (black*16)
+	call SetTextColor
+
+	mov dl, 19
+	mov dh, 4
+	call Gotoxy
+
+	mov esi, offset walls2
+
+	mov counter1, 50
+	mov counter2, 80
+	movzx ecx, counter1
+	printcolumn:
+		mov counter1, cl
+		movzx ecx, counter2
+		printrow:
+			mov eax, [esi]
+			call WriteChar
+            
+			inc esi
+		loop printrow
+		
+        dec counter1
+		movzx ecx, counter1
+
+		mov dl, 19
+		inc dh
+		call Gotoxy
+	loop printcolumn
+
+	ret
+DrawWall2 ENDP
 
 
 DrawWall3 PROC
@@ -1542,11 +1669,17 @@ InitialiseScreen PROC
     ; Draw the level layout at the start
     cmp level,1
     je level1
+    cmp level,2
+    je level2
     cmp level,3
     je level3
 
 level1:
     call DrawWall
+    call PrintPlayer
+    jmp done
+level2:
+    call DrawWall2
     call PrintPlayer
     jmp done
 level3:
