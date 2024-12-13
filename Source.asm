@@ -1,24 +1,4 @@
-; Skeleton Code for the game "Zumba", the COAL Project of CS-Batch 2023.
-; This code is intellectual property of 22i-0932, but may be used by the students of CS-Batch 2023 for their COAL Project.
-; The following code has been written in the Irvine32 library, and is meant to be run in the MASM assembler.
 
-; The program does ONLY what the official code uploaded by the lab instructors was supposed to do, except:
-; 1. the bullets fire in 8 directions instead of 4, to make the game more challenging.
-; 2. the emitter has no functionality yet. find ways to implement it yourself.
-; 3. the balls do not change color. find ways to implement it yourself.
-
-; Stop complaining about ambiguity in the instructions, although I understand your frustrations.
-; I sympathise with your workload, but it is time to lock in.
-
-; Best of luck soldiers. Reply in the comments if there are any queries about the functionalities implemented below.
-
-; hold your horses, because fortunately unfortunately there are still a lot of features to implement. karte raho implement.
-
-; PS. if anything breaks, i apologise. i wrote this code as a last minute decision. 
-
-; -------------------------------------------------------------------------------------------------------------------------
-
-; use QWEADZXC keys (omnidirectional) to rotate the player. use spacebar to shoot. and use your brain to code. good luck.
 
 include Irvine32.inc
 include macros.inc
